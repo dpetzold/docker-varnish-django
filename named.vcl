@@ -1,3 +1,6 @@
+# https://github.com/mattiasgeniar/varnish-4.0-configuration-templates/blob/master/default.vcl
+# https://github.com/Dridi/libvmod-named/blob/master/src/vmod_named.vcc
+
 vcl 4.0;
 
 import named;
@@ -15,7 +18,7 @@ backend default {
 }
 
 sub vcl_init {
-	new www_dir = named.director(
+	new named_director = named.director(
 		port = "80",
 		ttl = 5m,
   );
@@ -54,19 +57,32 @@ sub vcl_deliver {
 }
 
 sub vcl_recv {
-	set req.backend_hint = www_dir.backend("${VARNISH_NAMED_BACKEND}");
+	set req.backend_hint = named_director.backend("${VARNISH_NAMED_BACKEND}");
   set req.http.grace = "none";
 
 	# Normalize the query arguments
   set req.url = std.querysort(req.url);
 
-	# Pass health checks.
+	# Varnish health checks
+  if (req.url == "/varnish-health/" && client.ip ~ local) {
+    return (synth(200, "OK"));
+  }
+
+	# Pass application health checks.
   if (req.url == "${HEALTH_CHECK_URL}" && client.ip ~ local) {
     set req.http.host = "${NORMALIZED_HOST}";
     return (pass);
   }
 
+	if (req.http.Authorization) {
+    return (pass);
+  }
+
   if (req.url ~ "${ADMIN_URL}") {
+    return (pass);
+  }
+
+  if (req.url ~ "^/nocache") {
     return (pass);
   }
 
@@ -81,11 +97,6 @@ sub vcl_recv {
     set req.http.host = "${NORMALIZED_HOST}";
   } else {
     return (synth(400, "Bad request"));
-  }
-
-	if (req.http.Authorization) {
-    # Not cacheable by default
-    return (pass);
   }
 
 	return (hash);
