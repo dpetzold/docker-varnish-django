@@ -18,9 +18,9 @@ backend default {
 }
 
 sub vcl_init {
-	new named_director = named.director(
-		port = "80",
-		ttl = 5m,
+  new named_director = named.director(
+    port = "80",
+    ttl = 5m,
   );
 }
 
@@ -52,29 +52,29 @@ sub vcl_hit {
 }
 
 sub vcl_deliver {
-    # copy to resp so we can tell from the outside.
-    set resp.http.grace = req.http.grace;
+  # copy to resp so we can tell from the outside.
+  set resp.http.grace = req.http.grace;
 }
 
 sub vcl_recv {
-	set req.backend_hint = named_director.backend("${VARNISH_NAMED_BACKEND}");
+  set req.backend_hint = named_director.backend("${VARNISH_NAMED_BACKEND}");
   set req.http.grace = "none";
 
-	# Normalize the query arguments
+  # Normalize the query arguments
   set req.url = std.querysort(req.url);
 
-	# Varnish health checks
+  # Varnish health checks
   if (req.url == "/varnish-health/" && client.ip ~ local) {
     return (synth(200, "OK"));
   }
 
-	# Pass application health checks.
+  # Pass application health checks.
   if (req.url == "${HEALTH_CHECK_URL}" && client.ip ~ local) {
     set req.http.host = "${NORMALIZED_HOST}";
     return (pass);
   }
 
-	if (
+  if (
     req.http.Authorization || 
     req.url ~ "${ADMIN_URL}") ||
     req.url ~ "^/nocache"
@@ -85,7 +85,7 @@ sub vcl_recv {
   if (req.method == "GET" || req.method == "HEAD") {
     unset req.http.Cookie;  
   } else {
-		return (pass);
+    return (pass);
   }
 
   if (${ALLOWED_HOSTS_CHECK}) {
@@ -95,7 +95,7 @@ sub vcl_recv {
     return (synth(400, "Bad request"));
   }
 
-	return (hash);
+  return (hash);
 }  
 
 # The data on which the hashing will take place
@@ -145,7 +145,7 @@ sub vcl_backend_response {
 
   if (bereq.method == "GET" && !(bereq.url ~ "^/nocache")) {
     unset beresp.http.set-cookie;
-   	set beresp.ttl = 6h;
+    set beresp.ttl = 6h;
   }
   return (deliver);
 }

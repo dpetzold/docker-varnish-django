@@ -1,13 +1,12 @@
 FROM buildpack-deps:xenial
 
 MAINTAINER Derrick Petzold "varnish@petzold.io"
-ENV REFRESHED_AT 2016-07-10
 
 RUN apt-get update -qq && \
   apt-get -yqq install gettext-base python3-docutils && \
   apt-get -yqq clean
 
-ENV VARNISH_VERSION 4.1.3
+ENV VARNISH_VERSION 4.1.8
 
 VOLUME ["/var/lib/varnish", "/etc/varnish"]
 
