@@ -75,11 +75,12 @@ sub vcl_recv {
   }
 
   if (
-    req.http.Authorization || 
-    req.url ~ "${ADMIN_URL}") ||
-    req.url ~ "^/nocache"
+    req.url ~ "^/$"
+    req.url ~ "^/v/"
+    req.url ~ "^/api/post"
+    req.url ~ "^/api/blogrolls/"
   ) {
-    return (pass);
+    return (hash);
   }
 
   if (req.method == "GET" || req.method == "HEAD") {
@@ -88,14 +89,11 @@ sub vcl_recv {
     return (pass);
   }
 
-  if (${ALLOWED_HOSTS_CHECK}) {
-    # Normalize the host header
-    set req.http.host = "${NORMALIZED_HOST}";
-  } else {
+  if ( ! ${ALLOWED_HOSTS_CHECK}) {
     return (synth(400, "Bad request"));
   }
 
-  return (hash);
+  return (pass);
 }  
 
 # The data on which the hashing will take place
@@ -143,7 +141,7 @@ sub vcl_backend_response {
   # make Varnish keep all objects for 6 hours beyond their TTL
   set beresp.grace = 6h;
 
-  if (bereq.method == "GET" && !(bereq.url ~ "^/nocache")) {
+  if (bereq.method == "GET") {
     unset beresp.http.set-cookie;
     set beresp.ttl = 6h;
   }
