@@ -74,15 +74,11 @@ sub vcl_recv {
     return (pass);
   }
 
-	if (req.http.Authorization) {
-    return (pass);
-  }
-
-  if (req.url ~ "${ADMIN_URL}") {
-    return (pass);
-  }
-
-  if (req.url ~ "^/nocache") {
+	if (
+    req.http.Authorization || 
+    req.url ~ "${ADMIN_URL}") ||
+    req.url ~ "^/nocache"
+  ) {
     return (pass);
   }
 
@@ -134,7 +130,12 @@ sub vcl_deliver {
 
 sub vcl_backend_response {
   # Don't cache 50x responses
-  if (beresp.status == 500 || beresp.status == 502 || beresp.status == 503 || beresp.status == 504) {
+  if (
+    beresp.status == 500 ||
+    beresp.status == 502 ||
+    beresp.status == 503 ||
+    beresp.status == 504
+  ) {
     return (abandon);
   }
 
@@ -142,7 +143,7 @@ sub vcl_backend_response {
   # make Varnish keep all objects for 6 hours beyond their TTL
   set beresp.grace = 6h;
 
-  if (bereq.method == "GET") {
+  if (bereq.method == "GET" && !(bereq.url ~ "^/nocache")) {
     unset beresp.http.set-cookie;
    	set beresp.ttl = 6h;
   }

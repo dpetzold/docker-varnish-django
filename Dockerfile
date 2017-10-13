@@ -9,6 +9,8 @@ RUN apt-get update -qq && \
 
 ENV VARNISH_VERSION 4.1.3
 
+VOLUME ["/var/lib/varnish", "/etc/varnish"]
+
 RUN set -ex \
   && curl -fSL https://repo.varnish-cache.org/source/varnish-$VARNISH_VERSION.tar.gz -o varnish.tar.gz \
   && tar xf varnish.tar.gz \
@@ -29,7 +31,11 @@ RUN set -ex \
   && cd .. \
   && rm -r libvmod-named \
   && echo "/usr/local/lib/varnish/vmods" >> /etc/ld.so.conf.d/varnish.conf \
-  && ldconfig
+  && ldconfig \
+  && git clone https://github.com/varnishcache/varnish-devicedetect.git \
+  && cp varnish-devicedetect/devicedetect.vcl /etc/varnish \
+  && rm -r varnish-devicedetect
+
 
 ENV \
   VARNISH_BACKEND_IP=172.17.42.1 \
@@ -37,8 +43,6 @@ ENV \
   VARNISH_PORT=80
 
 EXPOSE 80
-
-VOLUME ["/var/lib/varnish", "/etc/varnish"]
 
 ADD start.sh /start.sh
 ADD default.vcl /etc/varnish/default.template
