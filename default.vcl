@@ -52,6 +52,7 @@ sub vcl_recv {
   set req.http.grace = "none";
   set req.http.X-Forwarded-Proto = "https";
   set req.http.User-Agent = req.http.User-Agent;
+  set req.http.X-CSRFToken = req.http.X-CSRFToken;
 
   # Normalize the query arguments
   set req.url = std.querysort(req.url);
