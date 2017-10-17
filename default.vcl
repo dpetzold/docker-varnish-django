@@ -50,6 +50,7 @@ sub vcl_deliver {
 
 sub vcl_recv {
   set req.http.grace = "none";
+  set req.http.X-Forwarded-Proto = "https"
 
   # Normalize the query arguments
   set req.url = std.querysort(req.url);
