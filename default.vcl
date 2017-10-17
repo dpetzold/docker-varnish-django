@@ -130,10 +130,10 @@ sub vcl_backend_response {
   set beresp.grace = 6h;
 
   if (
-    req.url ~ "^/$" ||
-    req.url ~ "^/v/" ||
-    req.url ~ "^/api/post" ||
-    req.url ~ "^/api/blogrolls/"
+    beresp.url ~ "^/$" ||
+    beresp.url ~ "^/v/" ||
+    beresp.url ~ "^/api/post" ||
+    beresp.url ~ "^/api/blogrolls/"
   ) {
     unset beresp.http.set-cookie;
     set beresp.ttl = 6h;
