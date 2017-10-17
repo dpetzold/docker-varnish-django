@@ -65,9 +65,9 @@ sub vcl_recv {
   }
 
   if (
-    req.url ~ "^/$"
-    req.url ~ "^/v/"
-    req.url ~ "^/api/post"
+    req.url ~ "^/$" ||
+    req.url ~ "^/v/" ||
+    req.url ~ "^/api/post" ||
     req.url ~ "^/api/blogrolls/"
   ) {
     return (hash);

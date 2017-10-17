@@ -16,7 +16,6 @@ export ALLOWED_HOSTS_CHECK=`echo ${ALLOWED_HOSTS_CHECK} | cut -c -${TRIM}`
 export NORMALIZED_HOST=${NORMALIZED_HOST}
 
 envsubst < /etc/varnish/default.template > /etc/varnish/default.vcl
-envsubst < /etc/varnish/named.template > /etc/varnish/named.vcl
 
 # Start varnish and log
 varnishd -f /etc/varnish/${VCL} -s malloc,100M -a 0.0.0.0:${VARNISH_PORT}
