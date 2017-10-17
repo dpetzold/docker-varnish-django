@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 VCL="default.vcl"
 
 ALLOWED_HOSTS_CHECK=''
