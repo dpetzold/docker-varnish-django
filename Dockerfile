@@ -28,6 +28,5 @@ EXPOSE 80
 
 ADD entrypoint.sh /entrypoint.sh
 ADD default.vcl /etc/varnish/default.template
-RUN mkdir /usr/local/var/varnish
 
 ENTRYPOINT ["/entrypoint.sh"]

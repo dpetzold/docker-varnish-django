@@ -18,6 +18,7 @@ export NORMALIZED_HOST=${NORMALIZED_HOST}
 envsubst < /etc/varnish/default.template > /etc/varnish/default.vcl
 
 # Start varnish and log
-varnishd -f /etc/varnish/${VCL} -s malloc,100M -a 0.0.0.0:${VARNISH_PORT}
-sleep 1
-varnishlog
+# varnishd -f /etc/varnish/${VCL} -s malloc,100M -a 0.0.0.0:${VARNISH_PORT}
+# sleep 1
+# varnishlog
+tail -f /dev/null
