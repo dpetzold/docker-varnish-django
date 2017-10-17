@@ -2,10 +2,6 @@
 
 VCL="default.vcl"
 
-if [[ $VARNISH_NAMED_BACKEND ]]; then
-	VCL="named.vcl"
-fi
-
 ALLOWED_HOSTS_CHECK=''
 NORMALIZED_HOST=
 for host in ${ALLOWED_HOSTS}; do
