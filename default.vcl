@@ -51,6 +51,7 @@ sub vcl_deliver {
 sub vcl_recv {
   set req.http.grace = "none";
   set req.http.X-Forwarded-Proto = "https";
+  set req.http.User-Agent = req.http.User-Agent;
 
   # Normalize the query arguments
   set req.url = std.querysort(req.url);
@@ -110,10 +111,6 @@ sub vcl_deliver {
 
   set resp.http.X-Cache-Hits = obj.hits;
   return (deliver);
-}
-
-sub vcl_backend_fetch {
-  set bereq.http.User-Agent = req.http.User-Agent;
 }
 
 sub vcl_backend_response {
