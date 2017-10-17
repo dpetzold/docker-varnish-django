@@ -71,13 +71,8 @@ sub vcl_recv {
     req.url ~ "^/api/post" ||
     req.url ~ "^/api/blogrolls/"
   ) {
-    return (hash);
-  }
-
-  if (req.method == "GET" || req.method == "HEAD") {
     unset req.http.Cookie;  
-  } else {
-    return (pass);
+    return (hash);
   }
 
   if ( ! ${ALLOWED_HOSTS_CHECK}) {
@@ -115,6 +110,10 @@ sub vcl_deliver {
 
   set resp.http.X-Cache-Hits = obj.hits;
   return (deliver);
+}
+
+sub vcl_backend_fetch {
+  set bereq.http.User-Agent = req.http.User-Agent;
 }
 
 sub vcl_backend_response {
