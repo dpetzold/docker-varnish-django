@@ -129,7 +129,12 @@ sub vcl_backend_response {
   # make Varnish keep all objects for 6 hours beyond their TTL
   set beresp.grace = 6h;
 
-  if (bereq.method == "GET") {
+  if (
+    req.url ~ "^/$" ||
+    req.url ~ "^/v/" ||
+    req.url ~ "^/api/post" ||
+    req.url ~ "^/api/blogrolls/"
+  ) {
     unset beresp.http.set-cookie;
     set beresp.ttl = 6h;
   }
